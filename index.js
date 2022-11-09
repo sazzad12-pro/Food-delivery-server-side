@@ -23,10 +23,18 @@ async function run() {
     app.get("/", (req, res) => {
       res.send("server is running");
     });
+    // limit service section api
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
       const user = await cursor.limit(3).toArray();
+      res.send(user);
+    });
+    // all service section api
+    app.get("/allService", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const user = await cursor.toArray();
       res.send(user);
     });
   } finally {
