@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
@@ -19,6 +19,9 @@ const client = new MongoClient(uri, {
 });
 async function run() {
   const serviceCollection = client.db("deliveryService").collection("services");
+  const reviewCollection = client
+    .db("deliveryService")
+    .collection("userReview");
   try {
     app.get("/", (req, res) => {
       res.send("server is running");
@@ -26,16 +29,37 @@ async function run() {
     // limit service section api
     app.get("/services", async (req, res) => {
       const query = {};
-      const cursor = serviceCollection.find(query);
+      const cursor = serviceCollection.find(query).sort({ rating: -1 });
       const user = await cursor.limit(3).toArray();
       res.send(user);
     });
     // all service section api
     app.get("/allService", async (req, res) => {
       const query = {};
-      const cursor = serviceCollection.find(query);
+      const cursor = serviceCollection.find(query).sort({ rating: -1 });
       const user = await cursor.toArray();
       res.send(user);
+    });
+    // find one service
+    app.get("/allService/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const cursor = serviceCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // review get api
+    app.get("/review", async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // review post api
+    app.post("/review", async (req, res) => {
+      const user = req.body;
+      const result = await reviewCollection.insertOne(user);
+      res.send(result);
     });
   } finally {
   }
