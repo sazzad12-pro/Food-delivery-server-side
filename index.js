@@ -40,6 +40,12 @@ async function run() {
       const user = await cursor.toArray();
       res.send(user);
     });
+    // order post api
+    app.post("/allService", async (req, res) => {
+      const user = req.body;
+      const result = await serviceCollection.insertOne(user);
+      res.send(result);
+    });
     // find one service
     app.get("/allService/:id", async (req, res) => {
       const id = req.params.id;
