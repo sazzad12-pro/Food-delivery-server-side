@@ -44,8 +44,8 @@ async function run() {
     app.get("/allService/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const cursor = serviceCollection.find(query);
-      const result = await cursor.toArray();
+      const result = await serviceCollection.findOne(query);
+
       res.send(result);
     });
     // review get api
@@ -59,6 +59,38 @@ async function run() {
     app.post("/review", async (req, res) => {
       const user = req.body;
       const result = await reviewCollection.insertOne(user);
+      res.send(result);
+    });
+    // review delete api
+    app.delete("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const deleteOk = await reviewCollection.deleteOne(query);
+      res.send(deleteOk);
+    });
+    // review find single data api
+    app.get("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.findOne(query);
+      res.send(result);
+    });
+    // review update put method
+    app.put("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const user = req.body;
+      const option = { upsert: true };
+      const updateUser = {
+        $set: {
+          reviewer: user.name,
+        },
+      };
+      const result = await reviewCollection.updateOne(
+        query,
+        updateUser,
+        option
+      );
       res.send(result);
     });
   } finally {
