@@ -18,9 +18,16 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 async function run() {
+  const serviceCollection = client.db("deliveryService").collection("services");
   try {
     app.get("/", (req, res) => {
       res.send("server is running");
+    });
+    app.get("/services", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const user = await cursor.limit(3).toArray();
+      res.send(user);
     });
   } finally {
   }
